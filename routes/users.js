@@ -1,5 +1,6 @@
 const express = require('express')
 const router = express.Router()
+const { validateAuthentication } = require('../middlewares/auth')
 const { validateUsername } = require('../middlewares/users')
 const {
   getAllUsers,
@@ -9,10 +10,10 @@ const {
   deleteUser
 } = require('../services/users')
 
-router.post('/', validateUsername, createUser)
-router.get('/:id', getUser)
-router.get('/', getAllUsers)
-router.delete('/:id', deleteUser)
-router.put('/:id', updateUser)
+router.post('/', validateAuthentication, validateUsername, createUser)
+router.get('/:id', validateAuthentication, getUser)
+router.get('/', validateAuthentication, getAllUsers)
+router.delete('/:id', validateAuthentication, deleteUser)
+router.put('/:id', validateAuthentication, updateUser)
 
 module.exports = router

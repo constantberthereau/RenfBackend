@@ -1,5 +1,7 @@
+const bcrypt = require('bcrypt')
 const { Op } = require('sequelize')
 const { User, History, dbInstance } = require('../models')
+require('dotenv').config()
 
 const getAllUsers = async (req, res) => {
   const query = {}
@@ -25,7 +27,7 @@ const getAllUsers = async (req, res) => {
     ]
   })
 
-  return res.status(200).json({ users })
+  return res.status(200).json({ users: users.map(user => user.clean ? user.clean() : user) })
 }
 
 const getUser = async (req, res) => {
@@ -40,7 +42,7 @@ const getUser = async (req, res) => {
     ]
   })
 
-  return res.status(200).json({ user })
+  return res.status(200).json({ user: user?.clean ? user.clean() : user })
 }
 
 const createUser = async (req, res) => {
@@ -59,12 +61,14 @@ const createUser = async (req, res) => {
       active
     } = req.body
 
+    const hashedPassword = await bcrypt.hash(password, parseInt(process.env.BCRYPT_SALT || '10', 10))
+
     const user = await User.create({
       username,
       firstname,
       lastname,
       email,
-      password,
+      password: hashedPassword,
       role,
       token,
       refresh_token,
@@ -73,7 +77,7 @@ const createUser = async (req, res) => {
     }, { transaction })
 
     await transaction.commit()
-    return res.status(201).json({ user })
+    return res.status(201).json({ user: user.clean() })
   } catch (err) {
     await transaction.rollback()
     return res.status(400).json({
@@ -100,18 +104,23 @@ const updateUser = async (req, res) => {
       active
     } = req.body
 
-    const user = await User.update({
+    const payload = {
       username,
       firstname,
       lastname,
       email,
-      password,
       role,
       token,
       refresh_token,
       two_step_code,
       active
-    }, {
+    }
+
+    if (password) {
+      payload.password = await bcrypt.hash(password, parseInt(process.env.BCRYPT_SALT || '10', 10))
+    }
+
+    const user = await User.update(payload, {
       where: { id: user_id },
       transaction
     })

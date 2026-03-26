@@ -1,5 +1,6 @@
 const express = require('express')
 const router = express.Router()
+const { validateAuthentication } = require('../middlewares/auth')
 const {
   getAllSinisters,
   getSinister,
@@ -8,10 +9,10 @@ const {
   deleteSinister
 } = require('../services/sinisters')
 
-router.post('/', createSinister)
-router.get('/:id', getSinister)
-router.get('/', getAllSinisters)
-router.delete('/:id', deleteSinister)
-router.put('/:id', updateSinister)
+router.post('/', validateAuthentication, createSinister)
+router.get('/:id', validateAuthentication, getSinister)
+router.get('/', validateAuthentication, getAllSinisters)
+router.delete('/:id', validateAuthentication, deleteSinister)
+router.put('/:id', validateAuthentication, updateSinister)
 
 module.exports = router

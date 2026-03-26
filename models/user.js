@@ -2,6 +2,11 @@ const { Model } = require('sequelize')
 
 const User = (dbInstance, DataTypes) => {
   class User extends Model {
+    clean() {
+      const { password, token, refresh_token, two_step_code, ...cleanedUser } = this.dataValues
+      return cleanedUser
+    }
+
     static associate(models) {
       this.hasMany(models.History, {
         foreignKey: 'user_id',
@@ -15,6 +20,7 @@ const User = (dbInstance, DataTypes) => {
       username: {
         type: DataTypes.STRING,
         allowNull: false,
+        unique: true,
       },
       email: {
         type: DataTypes.STRING,

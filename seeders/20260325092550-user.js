@@ -1,13 +1,16 @@
 'use strict'
+const bcrypt = require('bcrypt')
+require('dotenv').config()
 
 module.exports = {
   async up(queryInterface) {
+    const hashedpassword = await bcrypt.hash('MotDeP@ss123', parseInt(process.env.BCRYPT_SALT))
     await queryInterface.bulkInsert('User', [
       {
         id: 1,
         username: 'admin',
         email: 'admin@assurmoi.test',
-        password: 'password',
+        password: hashedpassword,
         firstname: 'Admin',
         lastname: 'AssurMoi',
         role: 'ADMIN',
@@ -20,7 +23,7 @@ module.exports = {
         id: 2,
         username: 'gestionnaire',
         email: 'gestionnaire@assurmoi.test',
-        password: 'password',
+        password: hashedpassword,
         firstname: 'Gina',
         lastname: 'Gestionnaire',
         role: 'PORTFOLIO_MANAGER',
@@ -33,7 +36,7 @@ module.exports = {
         id: 3,
         username: 'suivi',
         email: 'suivi@assurmoi.test',
-        password: 'password',
+        password: hashedpassword,
         firstname: 'Sam',
         lastname: 'Suivi',
         role: 'FOLLOW_UP_AGENT',
@@ -46,7 +49,7 @@ module.exports = {
         id: 4,
         username: 'clientele',
         email: 'clientele@assurmoi.test',
-        password: 'password',
+        password: hashedpassword,
         firstname: 'Claire',
         lastname: 'Clientele',
         role: 'CUSTOMER_ADVISOR',

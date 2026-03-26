@@ -1,5 +1,6 @@
 const express = require('express')
 const router = express.Router()
+const { validateAuthentication } = require('../middlewares/auth')
 const {
   getAllDocuments,
   getDocument,
@@ -8,10 +9,10 @@ const {
   deleteDocument
 } = require('../services/documents')
 
-router.post('/', createDocument)
-router.get('/:id', getDocument)
-router.get('/', getAllDocuments)
-router.delete('/:id', deleteDocument)
-router.put('/:id', updateDocument)
+router.post('/', validateAuthentication, createDocument)
+router.get('/:id', validateAuthentication, getDocument)
+router.get('/', validateAuthentication, getAllDocuments)
+router.delete('/:id', validateAuthentication, deleteDocument)
+router.put('/:id', validateAuthentication, updateDocument)
 
 module.exports = router
