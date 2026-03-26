@@ -1,6 +1,5 @@
-'use strict';
+'use strict'
 
-/** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('User', {
@@ -13,6 +12,12 @@ module.exports = {
       username: {
         type: Sequelize.STRING,
         allowNull: false,
+        unique: true,
+      },
+      email: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        unique: true,
       },
       password: {
         type: Sequelize.STRING,
@@ -26,35 +31,32 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: true,
       },
-      email: {
-        type: Sequelize.STRING
+      role: {
+        type: Sequelize.ENUM('ADMIN', 'PORTFOLIO_MANAGER', 'FOLLOW_UP_AGENT', 'CUSTOMER_ADVISOR', 'INSURED'),
+        allowNull: false,
+        defaultValue: 'INSURED',
       },
-      // person_id:{
-      //   type: Sequelize.INTEGER,
-      //   references: {
-      //     model: 'Person',
-      //     key: 'id'
-      //   }
-      // },
-      // updateAt: {
-      //   allowNull: false,
-      //   type: Sequelize.DATE,
-      //   defaultValue: Sequelize.literal('CURRENT_TIMESTAMP(3)')
-      // },
-      // updateAt: {
-      //   allowNull: false,
-      //   type: Sequelize.DATE,
-      //   defaultValue: Sequelize.literal('CURRENT_TIMESTAMP(3)')
-      // }
-      // createAt: {
-      //   allowNull: false,
-      //   type: Sequelize.DATE;
-      //   defaultValue: Sequelize.literal('CURRENT_TIMESTAMP(3)')
-      // }
+      token: {
+        type: Sequelize.TEXT,
+        allowNull: true,
+      },
+      refresh_token: {
+        type: Sequelize.TEXT,
+        allowNull: true,
+      },
+      two_step_code: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      active: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: true,
+      }
     })
   },
 
-  async down(queryInterface, Sequelize) {
+  async down(queryInterface) {
     await queryInterface.dropTable('User')
   }
-};
+}

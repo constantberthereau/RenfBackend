@@ -1,23 +1,32 @@
 const fs = require('fs')
 const path = require('path')
-const process = require('process')
 const basename = path.basename(__filename)
 const db = {}
 
 const { Sequelize } = require('sequelize')
-const User = require('./user')
 require('dotenv').config()
 
-// const DB_USER = process.env.BD_USERNAME || 'root';
-
-const dbInstance = new Sequelize(`mariadb://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`, {
-  dialect: 'mariadb',
-  dialectOptions: {
-    ssl: {
-      require: true,
+const dialectOptions = process.env.NODE_ENV === 'production'
+  ? {
+      ssl: {
+        require: true,
+        rejectUnauthorized: false,
+      }
     }
-  },
-})
+  : {}
+
+const dbInstance = new Sequelize(
+  process.env.DB_NAME,
+  process.env.DB_USER,
+  process.env.DB_PASSWORD,
+  {
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    dialect: 'mariadb',
+    logging: false,
+    dialectOptions,
+  }
+)
 
 fs
   .readdirSync(__dirname)
@@ -27,18 +36,18 @@ fs
       file !== basename &&
       file.slice(-3) === '.js' &&
       file.indexOf('.test.js') === -1
-    );
+    )
   })
   .forEach(file => {
-    const model = require(path.join(__dirname, file))(dbInstance, Sequelize.DataTypes);
-    db[model.name] = model;
-  });
+    const model = require(path.join(__dirname, file))(dbInstance, Sequelize.DataTypes)
+    db[model.name] = model
+  })
 
 Object.keys(db).forEach(modelName => {
   if (db[modelName].associate) {
-    db[modelName].associate(db);
+    db[modelName].associate(db)
   }
-});
+})
 
 module.exports = {
   dbInstance,
